@@ -102,13 +102,27 @@ export async function POST(request: NextRequest) {
     const { resume_data, job_description, instructions, resume_id, template_id, session_id } =
       parsed.data
 
-    // ── Deduct 50 Credits for Resume Build / Optimization ────────────────────
+    // ── Deduct 50 Credits for Resume Build ───────────────────────────────────
+    const candidateName = [
+      resume_data?.personal_info?.first_name,
+      resume_data?.personal_info?.last_name,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+
+    const serviceTitle = candidateName ? `Resume Build: ${candidateName}` : 'Resume Build: My Resume';
+
     const deduction = await deductCredits(supabase, {
       userId: user.id,
       amount: CREDIT_COSTS.RESUME_BUILD,
-      description: 'AI Resume Optimization & Formatting',
+      description: serviceTitle,
       serviceType: 'RESUME_BUILD',
-      details: { template_id },
+      details: {
+        template_id: template_id ?? 'template1',
+        resume_id: resume_id || undefined,
+        candidate_name: candidateName || undefined,
+      },
     })
 
     if (!deduction.success) {
@@ -219,6 +233,32 @@ export async function POST(request: NextRequest) {
 
       supabaseResumeId = inserted.id as string
     }
+
+    // ── Update the history activity record with the confirmed resume_id & title ──
+    const finalCandidateName =
+      [optimizedData.personal_info?.first_name, optimizedData.personal_info?.last_name]
+        .filter(Boolean)
+        .join(' ')
+        .trim() || candidateName;
+
+    const finalTitle = finalCandidateName
+      ? `Resume Build: ${finalCandidateName}`
+      : 'Resume Build: My Resume';
+
+    await supabase
+      .from('rb_user_history')
+      .update({
+        title: finalTitle,
+        details: {
+          template_id: template_id ?? 'template1',
+          resume_id: supabaseResumeId,
+          candidate_name: finalCandidateName || undefined,
+        },
+      })
+      .eq('user_id', user.id)
+      .eq('service_type', 'RESUME_BUILD')
+      .order('created_at', { ascending: false })
+      .limit(1);
 
     // ── Response ─────────────────────────────────────────────────────────────
     return NextResponse.json({

@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
 
     const resumesWithPdf = (data ?? []).map((r) => ({
       ...r,
-      pdf_storage_key: pdfKeyMap.get(r.id) ?? null,
+      pdf_storage_key: pdfKeyMap.get(r.id) ?? `generated_resumes/${user.id}/${r.id}.pdf`,
     }))
 
     return NextResponse.json({ resumes: resumesWithPdf })

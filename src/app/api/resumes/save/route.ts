@@ -84,19 +84,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: upsertError.message }, { status: 500 });
     }
 
-    // Log in rb_user_history
-    await supabase.from('rb_user_history').insert({
-      user_id: user.id,
-      service_type: 'RESUME_BUILD',
-      title: `Resume Build: ${title}`,
-      status: 'COMPLETED',
-      credits_used: 0,
-      details: {
-        resume_id: resumeId,
-        template_id: templateId,
-        pdf_storage_key: pdfStorageKey,
-      },
-    });
+    // Update existing rb_user_history record details to attach pdf_storage_key without creating a duplicate row
+    if (resumeId && pdfStorageKey) {
+      const { data: existingHistories } = await supabase
+        .from('rb_user_history')
+        .select('id, details')
+        .eq('user_id', user.id)
+        .eq('service_type', 'RESUME_BUILD')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      const matchingHistory = existingHistories?.find(
+        (h) => (h.details as any)?.resume_id === resumeId
+      );
+
+      if (matchingHistory) {
+        await supabase
+          .from('rb_user_history')
+          .update({
+            details: {
+              ...(typeof matchingHistory.details === 'object' && matchingHistory.details !== null
+                ? matchingHistory.details
+                : {}),
+              pdf_storage_key: pdfStorageKey,
+            },
+          })
+          .eq('id', matchingHistory.id);
+      }
+    }
 
     return NextResponse.json({
       success: true,
