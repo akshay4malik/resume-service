@@ -442,7 +442,7 @@ function BuilderStudioContent() {
               </div>
               <div className="w-full max-w-md rounded-xl overflow-hidden border border-sand-border bg-white shadow-sm">
                 <img
-                  src={TEMPLATES.find(t => t.id === templateId)?.previewUrl || '/images/templates/template1.png'}
+                  src={TEMPLATES.find(t => t.id === templateId)?.previewUrl || '/previews/template1_preview.png'}
                   alt={TEMPLATES.find(t => t.id === templateId)?.name || 'Selected Template Preview'}
                   className="w-full h-auto object-contain"
                 />

@@ -169,7 +169,7 @@ export default function ReziInspiredHomePage() {
             {/* Visual Thumbnail Image */}
             <div className="md:w-1/2 p-6 bg-canvas flex items-center justify-center border-b md:border-b-0 md:border-r border-sand-border">
               <img
-                src={TEMPLATES[selectedTemplateIndex]?.previewUrl || '/previews/template1.png'}
+                src={TEMPLATES[selectedTemplateIndex]?.previewUrl || '/previews/template1_preview.png'}
                 alt={TEMPLATES[selectedTemplateIndex]?.name}
                 className="w-full max-w-sm rounded-lg shadow-md border border-sand-border object-contain hover:scale-102 transition-transform duration-300"
               />
