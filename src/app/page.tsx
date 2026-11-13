@@ -416,6 +416,9 @@ export default function ReziInspiredHomePage() {
             <Link href="/refund-policy" className="hover:text-ink-dark transition">
               Refund Policy
             </Link>
+            <a href="mailto:info@kestralailabs.com" className="hover:text-ink-dark transition">
+              Contact
+            </a>
           </div>
         </div>
       </footer>

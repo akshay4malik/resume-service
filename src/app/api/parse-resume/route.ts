@@ -10,7 +10,7 @@
  * LLM prompt ported 1:1 from resume.py lines 622–659. Do NOT weaken or change.
  */
 
-export const maxDuration = 30 // Vercel function timeout (seconds)
+export const maxDuration = 60 // Vercel function timeout (seconds)
 export const runtime = 'nodejs' // needed for Buffer / unpdf operations
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -203,7 +203,6 @@ export async function POST(request: NextRequest) {
         content_type: 'application/pdf',
         status:       'COMPLETED',
         expires_at:   expiresAt,
-        processing_completed_at: new Date().toISOString(),
       })
 
     if (dbError) {

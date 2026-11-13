@@ -306,6 +306,9 @@ export default function ResumeRankerOverviewPage() {
             <Link href="/refund-policy" className="hover:text-[#0F172A] transition">
               Refund Policy
             </Link>
+            <a href="mailto:info@kestralailabs.com" className="hover:text-[#0F172A] transition">
+              Contact
+            </a>
           </div>
         </div>
       </footer>

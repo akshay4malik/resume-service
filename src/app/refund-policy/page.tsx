@@ -82,10 +82,10 @@ export default function RefundPolicyPage() {
               <div>
                 <div className="font-semibold text-slate-950 text-xs">Customer Support Email</div>
                 <a
-                  href="mailto:support@kestral.ai"
+                  href="mailto:info@kestralailabs.com"
                   className="text-xs text-sky-600 font-mono hover:underline"
                 >
-                  support@kestral.ai
+                  info@kestralailabs.com
                 </a>
               </div>
             </div>

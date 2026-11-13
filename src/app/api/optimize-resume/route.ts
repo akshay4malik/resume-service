@@ -10,7 +10,7 @@
  * LLM prompt ported 1:1 from resume.py. Do NOT weaken or change.
  */
 
-export const maxDuration = 25 // seconds — Vercel function timeout
+export const maxDuration = 60 // seconds — Vercel function timeout
 export const runtime = 'nodejs'
 
 import { NextRequest, NextResponse } from 'next/server'

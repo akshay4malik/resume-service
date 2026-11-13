@@ -104,11 +104,22 @@ function BuilderStudioContent() {
           body: formData,
         });
 
-        const parseJson = await parseRes.json();
-        if (!parseRes.ok) {
-          throw new Error(parseJson.error || 'Failed to extract text from PDF');
+        let parseJson: any = null;
+        try {
+          parseJson = await parseRes.json();
+        } catch {
+          // Response wasn't valid JSON (e.g. HTML 504 from server timeout)
         }
-        if (parseJson.resume_data) {
+
+        if (!parseRes.ok) {
+          throw new Error(
+            parseJson?.error ||
+            (parseRes.status === 504
+              ? 'Parsing took too long (gateway timeout). Please retry with a smaller PDF or concise document.'
+              : `Server error (${parseRes.status}): Failed to extract text from PDF.`)
+          );
+        }
+        if (parseJson?.resume_data) {
           baseData = parseJson.resume_data;
           setResumeData(baseData);
         }
@@ -128,20 +139,31 @@ function BuilderStudioContent() {
         }),
       });
 
-      const optJson = await optRes.json();
+      let optJson: any = null;
+      try {
+        optJson = await optRes.json();
+      } catch {
+        // Response wasn't valid JSON
+      }
+
       if (!optRes.ok) {
         if (optRes.status === 402) {
           setShowPricingModal(true);
           throw new Error('Insufficient credits (50 credits required).');
         }
-        throw new Error(optJson.error || 'Failed to enhance resume');
+        throw new Error(
+          optJson?.error ||
+          (optRes.status === 504
+            ? 'AI optimization took too long. Please try again.'
+            : `Server error (${optRes.status}): Failed to enhance resume.`)
+        );
       }
 
-      if (optJson.resume_id) {
+      if (optJson?.resume_id) {
         setCurrentResumeId(optJson.resume_id);
       }
 
-      if (optJson.resume_data) {
+      if (optJson?.resume_data) {
         setResumeData(optJson.resume_data);
         setDataVersion((v) => v + 1);
       }
