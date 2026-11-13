@@ -17,8 +17,10 @@ import {
   Users,
 } from 'lucide-react';
 import { UserMenu } from '@/components/auth/UserMenu';
+import { useGeoPricing } from '@/lib/useGeoPricing';
 
 export default function ResumeRankerOverviewPage() {
+  const { isIndia } = useGeoPricing();
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#1E293B] font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col justify-between">
       {/* ── Top Navbar ── */}
@@ -95,7 +97,7 @@ export default function ResumeRankerOverviewPage() {
               href="#pricing"
               className="w-full sm:w-auto px-7 py-4 rounded-xl bg-white hover:bg-[#F4F4F0] text-[#334155] font-semibold text-sm border border-[#E8E8E3] transition-all flex items-center justify-center gap-2 shadow-2xs"
             >
-              View Flat Pricing (₹2 / resume)
+              View Flat Pricing ({isIndia ? '₹2' : '$0.04'} / resume)
             </a>
           </div>
         </section>
@@ -231,7 +233,7 @@ export default function ResumeRankerOverviewPage() {
               Simple, Transparent Pricing
             </span>
             <h2 className="text-3xl font-extrabold text-[#0F172A] tracking-tight mt-2">
-              Flat ₹2 per resume ranking. No subscriptions.
+              Flat {isIndia ? '₹2' : '$0.04'} per resume ranking. No subscriptions.
             </h2>
             <p className="mt-3 text-[#64748B] text-sm max-w-xl mx-auto">
               Pay only for what you evaluate. No monthly commitments, hidden charges, or minimum contract sizes.
@@ -243,11 +245,13 @@ export default function ResumeRankerOverviewPage() {
               </div>
 
               <div className="flex items-baseline gap-2">
-                <span className="text-5xl font-black text-[#0F172A] tracking-tight">₹2</span>
+                <span className="text-5xl font-black text-[#0F172A] tracking-tight">
+                  {isIndia ? '₹2' : '$0.04'}
+                </span>
                 <span className="text-sm font-semibold text-[#64748B]">/ candidate resume</span>
               </div>
               <p className="text-xs text-sky-700 font-semibold mt-1">
-                2 Credits = ₹2.00 per resume
+                {isIndia ? '2 Credits = ₹2.00 per resume' : '2 Credits = $0.04 per resume ($4 for 100 candidates)'}
               </p>
 
               <div className="mt-6 pt-6 border-t border-[#E8E8E3] space-y-3 text-xs text-[#334155]">
@@ -298,7 +302,7 @@ export default function ResumeRankerOverviewPage() {
           </div>
           <div className="flex items-center gap-6 font-medium text-[#475569]">
             <Link href="/" className="hover:text-[#0F172A] transition">
-              Resume Builder (₹50 / resume)
+              Resume Builder ({isIndia ? '₹50' : '$1'} / resume)
             </Link>
             <Link href="/ranking/app" className="hover:text-[#0F172A] transition">
               Recruiter Dashboard

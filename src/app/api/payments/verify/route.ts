@@ -81,12 +81,13 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
 
     // Ledger entry
+    const priceFormatted = payment.currency === 'USD' ? `$${(payment.amount / 100).toFixed(2)}` : `₹${payment.amount / 100}`
     await supabase.from('rb_credit_transactions').insert({
       user_id: user.id,
       transaction_type: 'PURCHASE',
       amount: creditsToAdd,
       balance_after: newBalance,
-      description: `Purchased ${creditsToAdd} credits via Razorpay`,
+      description: `Purchased ${creditsToAdd} credits (${priceFormatted})`,
       payment_id: payment.id,
     })
 

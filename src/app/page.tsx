@@ -18,9 +18,11 @@ import {
 } from 'lucide-react';
 import { TEMPLATES } from '@/components/pdf/DynamicResumeTemplate';
 import { UserMenu } from '@/components/auth/UserMenu';
+import { useGeoPricing } from '@/lib/useGeoPricing';
 
 export default function ReziInspiredHomePage() {
   const [selectedTemplateIndex, setSelectedTemplateIndex] = useState(0);
+  const { isIndia } = useGeoPricing();
 
   return (
     <div className="min-h-screen bg-canvas text-ink font-sans antialiased selection:bg-sky-500 selection:text-white">
@@ -343,7 +345,7 @@ export default function ReziInspiredHomePage() {
             Transparent Pricing
           </span>
           <h2 className="text-3xl font-extrabold text-ink-dark tracking-tight mt-2">
-            Flat ₹50 per resume build. Zero subscriptions.
+            Flat {isIndia ? '₹50' : '$1'} per resume build. Zero subscriptions.
           </h2>
           <p className="mt-3 text-ink-muted text-sm max-w-xl mx-auto">
             Design, tailor with AI against any target job description, and export pixel-perfect ATS PDFs. No monthly lock-in.
@@ -355,11 +357,13 @@ export default function ReziInspiredHomePage() {
             </div>
 
             <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-black text-ink-dark tracking-tight">₹50</span>
+              <span className="text-5xl font-black text-ink-dark tracking-tight">
+                {isIndia ? '₹50' : '$1'}
+              </span>
               <span className="text-sm font-semibold text-ink-muted">/ resume build</span>
             </div>
             <p className="text-xs text-sky-700 font-semibold mt-1">
-              50 Credits = ₹50.00 per generated resume
+              {isIndia ? '50 Credits = ₹50.00 per generated resume' : '50 Credits = $1.00 per generated resume'}
             </p>
 
             <div className="mt-6 pt-6 border-t border-sand-border space-y-3 text-xs text-ink">
@@ -385,7 +389,7 @@ export default function ReziInspiredHomePage() {
               href="/builder"
               className="mt-8 w-full py-3.5 rounded-xl bg-ink-dark hover:bg-sky-600 text-white font-bold text-xs transition flex items-center justify-center gap-2 shadow-sm"
             >
-              <span>Build Your Resume (₹50)</span>
+              <span>Build Your Resume ({isIndia ? '₹50' : '$1'})</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
 

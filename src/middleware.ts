@@ -16,8 +16,8 @@ import { updateSession } from '@/lib/supabase/middleware'
 // Routes that do NOT require authentication
 const PUBLIC_ROUTES = ['/', '/login', '/signup']
 
-// Prefixes that are always public (e.g. /api/auth/* for Supabase callbacks)
-const PUBLIC_API_PREFIXES = ['/api/auth', '/auth/callback']
+// Prefixes that are always public (e.g. /api/auth/* for Supabase callbacks, /api/geo for currency detection)
+const PUBLIC_API_PREFIXES = ['/api/auth', '/auth/callback', '/api/geo']
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.includes(pathname)) return true

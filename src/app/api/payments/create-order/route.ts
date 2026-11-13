@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-// Pricing tiers matching 1 Credit = ₹1.00 (Flat ₹50 / resume, Flat ₹2 / rank)
-const CREDIT_PACKS: Record<string, { credits: number; amountPaise: number; label: string }> = {
-  resume_single: { credits: 50, amountPaise: 5000, label: '1 Resume Build (50 Credits) - ₹50' },   // ₹50 (1 Resume)
-  resume_duo: { credits: 100, amountPaise: 10000, label: '2 Resume Builds (100 Credits) - ₹100' }, // ₹100 (2 Resumes)
-  recruiter_100: { credits: 200, amountPaise: 20000, label: '100 Resume Rankings (200 Credits) - ₹200' }, // ₹200 (100 candidates)
-  recruiter_250: { credits: 500, amountPaise: 50000, label: '250 Resume Rankings (500 Credits) - ₹500' }, // ₹500 (250 candidates)
+// INR Pricing: 1 Credit = ₹1.00 (Flat ₹50 / resume, Flat ₹2 / rank)
+const CREDIT_PACKS_INR: Record<string, { credits: number; amount: number; label: string }> = {
+  resume_single: { credits: 50, amount: 5000, label: '1 Resume Build (50 Credits) - ₹50' },
+  resume_duo: { credits: 100, amount: 10000, label: '2 Resume Builds (100 Credits) - ₹100' },
+  recruiter_100: { credits: 200, amount: 20000, label: '100 Resume Rankings (200 Credits) - ₹200' },
+  recruiter_250: { credits: 500, amount: 50000, label: '250 Resume Rankings (500 Credits) - ₹500' },
+}
+
+// USD Pricing: $1.00 = 50 Credits (Flat $1 / resume, Flat $0.04 / rank)
+const CREDIT_PACKS_USD: Record<string, { credits: number; amount: number; label: string }> = {
+  resume_single: { credits: 50, amount: 100, label: '1 Resume Build (50 Credits) - $1' },
+  resume_duo: { credits: 100, amount: 200, label: '2 Resume Builds (100 Credits) - $2' },
+  recruiter_100: { credits: 200, amount: 400, label: '100 Resume Rankings (200 Credits) - $4' },
+  recruiter_250: { credits: 500, amount: 1000, label: '250 Resume Rankings (500 Credits) - $10' },
 }
 
 export async function POST(request: NextRequest) {
@@ -18,32 +26,61 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const body = await request.json()
+    const { packId, customAmount, requestedCurrency } = body
+
+    // Detect currency from request body, cookie, or Vercel edge country header
+    const cookieCurrency = request.cookies.get('kestral_currency')?.value
+    const vercelCountry = request.headers.get('x-vercel-ip-country') || 'IN'
+
+    let currency = 'INR'
+    if (requestedCurrency) {
+      currency = requestedCurrency.toUpperCase() === 'USD' ? 'USD' : 'INR'
+    } else if (cookieCurrency) {
+      currency = cookieCurrency.toUpperCase() === 'USD' ? 'USD' : 'INR'
+    } else {
+      currency = vercelCountry.toUpperCase() === 'IN' ? 'INR' : 'USD'
+    }
+
+    const isUSD = currency === 'USD'
+    const packs = isUSD ? CREDIT_PACKS_USD : CREDIT_PACKS_INR
+
     let credits: number
-    let amountPaise: number
+    let amountInSmallestUnit: number // Paise for INR, Cents for USD
     let label: string
     let pack_id = 'custom'
 
-    const body = await request.json()
-    const { packId, customAmount } = body
-
     if (customAmount !== undefined && customAmount !== null) {
       const amt = Number(customAmount)
-      if (isNaN(amt) || amt < 10) {
-        return NextResponse.json({ error: 'Minimum top up amount is ₹10' }, { status: 400 })
+      if (isUSD) {
+        if (isNaN(amt) || amt < 1) {
+          return NextResponse.json({ error: 'Minimum top up amount is $1' }, { status: 400 })
+        }
+        if (amt > 1000) {
+          return NextResponse.json({ error: 'Maximum single top up amount is $1,000' }, { status: 400 })
+        }
+        credits = Math.floor(amt * 50) // $1 = 50 credits
+        amountInSmallestUnit = Math.round(amt * 100) // in cents
+        label = `Custom Credit Top-up (${credits} Credits) - $${amt}`
+        pack_id = `custom_${amt}_usd`
+      } else {
+        if (isNaN(amt) || amt < 10) {
+          return NextResponse.json({ error: 'Minimum top up amount is ₹10' }, { status: 400 })
+        }
+        if (amt > 50000) {
+          return NextResponse.json({ error: 'Maximum single top up amount is ₹50,000' }, { status: 400 })
+        }
+        credits = Math.floor(amt) // ₹1 = 1 credit
+        amountInSmallestUnit = Math.round(amt * 100) // in paise
+        label = `Custom Credit Top-up (${credits} Credits) - ₹${amt}`
+        pack_id = `custom_${amt}_inr`
       }
-      if (amt > 50000) {
-        return NextResponse.json({ error: 'Maximum single top up amount is ₹50,000' }, { status: 400 })
-      }
-      credits = Math.floor(amt) // 1 Rupee = 1 Credit
-      amountPaise = Math.round(amt * 100)
-      label = `Custom Credit Top-up (${credits} Credits) - ₹${amt}`
-      pack_id = `custom_${amt}`
-    } else if (packId && CREDIT_PACKS[packId]) {
-      const pack = CREDIT_PACKS[packId]
+    } else if (packId && packs[packId]) {
+      const pack = packs[packId]
       credits = pack.credits
-      amountPaise = pack.amountPaise
+      amountInSmallestUnit = pack.amount
       label = pack.label
-      pack_id = packId
+      pack_id = `${packId}_${currency.toLowerCase()}`
     } else {
       return NextResponse.json({ error: 'Please specify a valid package or custom amount' }, { status: 400 })
     }
@@ -53,13 +90,13 @@ export async function POST(request: NextRequest) {
 
     if (!keyId || !keySecret || keyId.startsWith('rzp_live_...')) {
       return NextResponse.json({ 
-        error: 'Razorpay API credentials not configured in .env.local',
+        error: 'Payment gateway API credentials not configured in .env.local',
       }, { status: 503 })
     }
 
-    // Call Razorpay API to generate order
+    // Call Razorpay API to generate order in requested currency (INR or USD)
     const authHeader = 'Basic ' + Buffer.from(`${keyId}:${keySecret}`).toString('base64')
-    const receipt = `kestral_rcpt_${Date.now()}`
+    const receipt = `kestral_${currency.toLowerCase()}_${Date.now()}`
 
     const rzpResponse = await fetch('https://api.razorpay.com/v1/orders', {
       method: 'POST',
@@ -68,46 +105,47 @@ export async function POST(request: NextRequest) {
         Authorization: authHeader,
       },
       body: JSON.stringify({
-        amount: amountPaise,
-        currency: 'INR',
+        amount: amountInSmallestUnit,
+        currency,
         receipt,
         notes: {
           user_id: user.id,
           pack_id,
           credits,
+          currency,
         },
       }),
     })
 
     const orderData = await rzpResponse.json()
     if (!rzpResponse.ok) {
-      return NextResponse.json({ error: orderData.error?.description || 'Razorpay order creation failed' }, { status: 502 })
+      return NextResponse.json({ error: orderData.error?.description || 'Payment order creation failed' }, { status: 502 })
     }
 
     // Record order in rb_payments table
     await supabase.from('rb_payments').insert({
       user_id: user.id,
       razorpay_order_id: orderData.id,
-      amount: amountPaise,
-      currency: 'INR',
+      amount: amountInSmallestUnit,
+      currency,
       status: 'PENDING',
       credits_purchased: credits,
-      metadata: { pack_id, receipt },
+      metadata: { pack_id, receipt, currency },
     })
 
     return NextResponse.json({
       orderId: orderData.id,
-      amount: amountPaise,
-      currency: 'INR',
+      amount: amountInSmallestUnit,
+      currency,
       keyId,
       pack: {
+        id: pack_id,
         credits,
-        amountPaise,
         label,
       },
     })
   } catch (err: any) {
+    console.error('[create-order] Error:', err)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
-
