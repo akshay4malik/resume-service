@@ -266,7 +266,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
 
         <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-center gap-2 text-xs text-slate-400">
           <ShieldCheck className="w-4 h-4 text-slate-400" />
-          <span>Secured by Razorpay • Instant Crediting • 256-Bit SSL Encrypted</span>
+          <span>100% Secure Checkout • Instant Crediting • 256-Bit SSL Encrypted</span>
         </div>
       </div>
     </div>,

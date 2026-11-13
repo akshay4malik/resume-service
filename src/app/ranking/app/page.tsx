@@ -320,7 +320,7 @@ export default function ResumeRankingPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink flex flex-col">
       {/* Top Navigation */}
-      <header className="border-b border-sand-border bg-canvas-card/95 backdrop-blur-md sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
+      <header className="bg-canvas-card/95 backdrop-blur-md sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link
             href="/"

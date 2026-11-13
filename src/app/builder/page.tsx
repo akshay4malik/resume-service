@@ -186,7 +186,7 @@ function BuilderStudioContent() {
   return (
     <div className="flex flex-col min-h-screen bg-canvas text-ink">
       {/* Studio Header */}
-      <header className="border-b border-sand-border bg-canvas/90 backdrop-blur-md sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
+      <header className="bg-canvas/90 backdrop-blur-md sticky top-0 z-40 px-6 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link
             href="/"

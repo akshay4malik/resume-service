@@ -25,7 +25,7 @@ export default function ReziInspiredHomePage() {
   return (
     <div className="min-h-screen bg-canvas text-ink font-sans antialiased selection:bg-sky-500 selection:text-white">
       {/* ── 1. Top Navbar (Clean header matching theme) ──── */}
-      <header className="sticky top-0 z-50 bg-canvas/90 backdrop-blur-md border-b border-sand-border transition-colors">
+      <header className="sticky top-0 z-50 bg-canvas/90 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
           {/* Logo & Brand */}
           <Link href="/" className="flex items-center gap-3 group">
@@ -391,7 +391,7 @@ export default function ReziInspiredHomePage() {
 
             <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-ink-subtle">
               <ShieldCheck className="w-3.5 h-3.5 text-ink-subtle" />
-              <span>Instant Razorpay checkout • 100% Secure</span>
+              <span>Instant activation • 100% Secure Checkout</span>
             </div>
           </div>
         </div>

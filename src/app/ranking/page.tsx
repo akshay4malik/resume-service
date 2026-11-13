@@ -22,7 +22,7 @@ export default function ResumeRankerOverviewPage() {
   return (
     <div className="min-h-screen bg-[#FAFAF8] text-[#1E293B] font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col justify-between">
       {/* ── Top Navbar ── */}
-      <header className="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-md border-b border-[#E8E8E3]">
+      <header className="sticky top-0 z-50 bg-[#FAFAF8]/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <div className="w-9 h-9 rounded-xl overflow-hidden shadow-xs border border-sand-border group-hover:border-sky-500 transition-colors bg-white flex items-center justify-center">
@@ -283,7 +283,7 @@ export default function ResumeRankerOverviewPage() {
 
               <div className="mt-4 flex items-center justify-center gap-1.5 text-[11px] text-[#94A3B8]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#94A3B8]" />
-                <span>Instant activation via Razorpay • 100% Secure</span>
+                <span>Instant activation • 100% Secure Checkout</span>
               </div>
             </div>
           </div>
