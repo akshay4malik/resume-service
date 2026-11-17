@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
+import { AuthModal } from './AuthModal';
 
 interface CreditState {
   current_balance: number;
@@ -15,8 +16,13 @@ interface AuthContextType {
   loading: boolean;
   credits: CreditState | null;
   signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUpWithEmail: (email: string, password: string) => Promise<{ error: Error | null }>;
+  changePassword: (oldPassword: string, newPassword: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   refreshCredits: () => Promise<void>;
+  openAuthModal: (tab?: 'signin' | 'signup') => void;
+  closeAuthModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -24,14 +30,22 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   credits: null,
   signInWithGoogle: async () => {},
+  signInWithEmail: async () => ({ error: null }),
+  signUpWithEmail: async () => ({ error: null }),
+  changePassword: async () => ({ error: null }),
   signOut: async () => {},
   refreshCredits: async () => {},
+  openAuthModal: () => {},
+  closeAuthModal: () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [credits, setCredits] = useState<CreditState | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'signin' | 'signup'>('signin');
+
   const supabase = createClient();
 
   const fetchCredits = async () => {
@@ -76,6 +90,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  const openAuthModal = (tab: 'signin' | 'signup' = 'signin') => {
+    setAuthModalTab(tab);
+    setIsAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setIsAuthModalOpen(false);
+  };
+
   const signInWithGoogle = async () => {
     const redirectUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(window.location.pathname)}`;
     await supabase.auth.signInWithOAuth({
@@ -84,6 +107,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         redirectTo: redirectUrl,
       },
     });
+  };
+
+  const signInWithEmail = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      return { error: new Error(error.message) };
+    }
+    if (data.user) {
+      setUser(data.user);
+      await fetchCredits();
+    }
+    return { error: null };
+  };
+
+  const signUpWithEmail = async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+    if (error) {
+      return { error: new Error(error.message) };
+    }
+    if (data.user) {
+      setUser(data.user);
+      await fetchCredits();
+    }
+    return { error: null };
+  };
+
+  const changePassword = async (oldPassword: string, newPassword: string) => {
+    if (!user || !user.email) {
+      return { error: new Error('You must be signed in to change your password.') };
+    }
+
+    // Step 1: Verify current credentials
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: oldPassword,
+    });
+    if (verifyError) {
+      return { error: new Error('Current password is incorrect.') };
+    }
+
+    // Step 2: Update password with current_password for compatibility
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+      current_password: oldPassword,
+    } as any);
+
+    if (updateError) {
+      return { error: new Error(updateError.message) };
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {
@@ -100,14 +180,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         credits,
         signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
+        changePassword,
         signOut,
         refreshCredits: fetchCredits,
+        openAuthModal,
+        closeAuthModal,
       }}
     >
       {children}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={closeAuthModal}
+        initialTab={authModalTab}
+      />
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-

@@ -44,7 +44,7 @@ function BuilderStudioContent() {
   const [isProceeding, setIsProceeding] = useState(false);
   const [processingStatus, setProcessingStatus] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const { user, credits, refreshCredits, signInWithGoogle } = useAuth();
+  const { user, credits, refreshCredits, openAuthModal } = useAuth();
   const [showPricingModal, setShowPricingModal] = useState(false);
 
   // Load existing resume if resumeId query param is present
@@ -75,7 +75,7 @@ function BuilderStudioContent() {
   // 3. System extracts & enhances content, deducts credits, and takes user to EDIT step
   const handleEnhanceResume = async () => {
     if (!user) {
-      signInWithGoogle();
+      openAuthModal('signin');
       return;
     }
 
