@@ -257,9 +257,6 @@ export const ResumeTemplate: React.FC<ResumeTemplateProps> = ({ data }) => {
               <View key={index} style={styles.itemBlock}>
                 <View style={styles.rowHeader}>
                   <Text style={styles.itemTitle}>{proj.name}</Text>
-                  <Text style={styles.dateRange}>
-                    {Array.isArray(proj.technologies) ? proj.technologies.join(', ') : proj.technologies || ''}
-                  </Text>
                 </View>
                 {proj.description && <Text style={styles.summaryText}>{proj.description}</Text>}
               </View>

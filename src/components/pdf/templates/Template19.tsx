@@ -107,7 +107,6 @@ export const Template19: React.FC<{ data: ResumeData }> = ({ data }) => {
               <View key={i} style={{ marginBottom: 3 }}>
                 <View style={styles19.row}>
                   <Text style={styles19.jobTitle}>{proj.name}</Text>
-                  <Text style={styles19.date}>{Array.isArray(proj.technologies) ? proj.technologies.join(', ') : proj.technologies}</Text>
                 </View>
                 <Text style={styles19.text}>{proj.description}</Text>
               </View>
