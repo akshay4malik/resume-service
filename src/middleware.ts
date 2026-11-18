@@ -14,7 +14,16 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 // Routes that do NOT require authentication
-const PUBLIC_ROUTES = ['/', '/login', '/signup']
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/signup',
+  '/refund-policy',
+  '/terms',
+  '/privacy',
+  '/shipping-policy',
+  '/contact',
+]
 
 // Prefixes that are always public (e.g. /api/auth/* for Supabase callbacks, /api/geo for currency detection)
 const PUBLIC_API_PREFIXES = ['/api/auth', '/auth/callback', '/api/geo']

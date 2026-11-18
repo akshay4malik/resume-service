@@ -296,23 +296,29 @@ export default function ResumeRankerOverviewPage() {
 
       {/* ── Footer ── */}
       <footer className="bg-[#FAFAF8] border-t border-[#E8E8E3] py-10 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-[#64748B] gap-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-[#64748B] gap-4">
           <div>
-            © {new Date().getFullYear()} Kestral AI Labs LLP. All rights reserved.
+            © {new Date().getFullYear()} Kestral AI Labs. All rights reserved.
           </div>
-          <div className="flex items-center gap-6 font-medium text-[#475569]">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-[#475569]">
             <Link href="/" className="hover:text-[#0F172A] transition">
               Resume Builder ({isIndia ? '₹50' : '$1'} / resume)
             </Link>
-            <Link href="/ranking/app" className="hover:text-[#0F172A] transition">
-              Recruiter Dashboard
+            <Link href="/terms" className="hover:text-[#0F172A] transition">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-[#0F172A] transition">
+              Privacy
             </Link>
             <Link href="/refund-policy" className="hover:text-[#0F172A] transition">
               Refund Policy
             </Link>
-            <a href="mailto:info@kestralailabs.com" className="hover:text-[#0F172A] transition">
-              Contact
-            </a>
+            <Link href="/shipping-policy" className="hover:text-[#0F172A] transition">
+              Delivery Policy
+            </Link>
+            <Link href="/contact" className="hover:text-[#0F172A] transition">
+              Contact Us
+            </Link>
           </div>
         </div>
       </footer>

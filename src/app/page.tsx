@@ -401,28 +401,34 @@ export default function ReziInspiredHomePage() {
         </div>
       </section>
 
-      {/* ── 6. Clean Minimalist Footer (Navigation Links Only, Includes Refund Policy) ── */}
+      {/* ── 6. Clean Minimalist Footer (Navigation Links & Compliance Policies) ── */}
       <footer className="bg-canvas border-t border-sand-border py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-ink-muted gap-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between text-xs text-ink-muted gap-4">
           <div>
-            © {new Date().getFullYear()} Kestral AI Labs LLP. All rights reserved.
+            © {new Date().getFullYear()} Kestral AI Labs. All rights reserved.
           </div>
-          <div className="flex items-center gap-6 font-medium text-ink-muted">
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-medium text-ink-muted">
             <Link href="/builder" className="hover:text-ink-dark transition">
               Resume Builder
             </Link>
-            <a href="#templates" className="hover:text-ink-dark transition">
-              Templates
-            </a>
             <Link href="/ranking" className="hover:text-ink-dark transition">
               For Recruiters
+            </Link>
+            <Link href="/terms" className="hover:text-ink-dark transition">
+              Terms & Conditions
+            </Link>
+            <Link href="/privacy" className="hover:text-ink-dark transition">
+              Privacy Policy
             </Link>
             <Link href="/refund-policy" className="hover:text-ink-dark transition">
               Refund Policy
             </Link>
-            <a href="mailto:info@kestralailabs.com" className="hover:text-ink-dark transition">
-              Contact
-            </a>
+            <Link href="/shipping-policy" className="hover:text-ink-dark transition">
+              Delivery Policy
+            </Link>
+            <Link href="/contact" className="hover:text-ink-dark transition">
+              Contact Us
+            </Link>
           </div>
         </div>
       </footer>
