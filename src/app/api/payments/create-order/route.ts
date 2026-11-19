@@ -85,6 +85,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Please specify a valid package or custom amount' }, { status: 400 })
     }
 
+    if (amountInSmallestUnit < 100) {
+      return NextResponse.json({ error: 'Minimum amount must be at least 100 paise' }, { status: 400 })
+    }
+
     const keyId = process.env.RAZORPAY_KEY_ID
     const keySecret = process.env.RAZORPAY_KEY_SECRET
 
@@ -135,6 +139,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       orderId: orderData.id,
+      order_id: orderData.id,
       amount: amountInSmallestUnit,
       currency,
       keyId,

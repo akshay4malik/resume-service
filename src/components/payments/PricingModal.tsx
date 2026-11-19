@@ -90,12 +90,17 @@ export const PricingModal: React.FC<PricingModalProps> = ({
         currency: orderData.currency,
         name: 'Kestral AI Labs',
         description: orderData.pack.label,
-        order_id: orderData.orderId,
+        order_id: orderData.orderId || orderData.order_id,
         prefill: {
           email: user?.email || '',
         },
         theme: {
           color: '#0284c7', // Skyblue
+        },
+        modal: {
+          ondismiss: () => {
+            setLoadingPack(null);
+          },
         },
         handler: async (response: any) => {
           try {
@@ -118,11 +123,17 @@ export const PricingModal: React.FC<PricingModalProps> = ({
             }
           } catch (e: any) {
             setErrorMsg(e.message);
+          } finally {
+            setLoadingPack(null);
           }
         },
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', (response: any) => {
+        setErrorMsg(response?.error?.description || 'Payment failed. Please try again.');
+        setLoadingPack(null);
+      });
       rzp.open();
     } catch (err: any) {
       setErrorMsg(err.message || 'Payment initiation failed.');

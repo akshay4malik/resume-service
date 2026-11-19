@@ -77,6 +77,9 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     if (!user) {
+      if (pathname.startsWith('/api')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      }
       // Redirect unauthenticated users to /login, preserving the original URL
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('redirectTo', pathname)
